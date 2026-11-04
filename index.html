@@ -115,7 +115,7 @@ function gate(){
     if(sessionStorage.getItem('pb_ok')!=='1') sessionStorage.setItem('pb_ok','1'); render(); }
   else { document.getElementById('pwerr').textContent='密码错误'; }
 }
-if(sessionStorage.getItem('pb_ok')==='1'){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display=''; }
+if(sessionStorage.getItem('pb_ok')==='1'){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display=''; render(); }
 
 function saveLocal(){ try{ localStorage.setItem('postboard_pub', JSON.stringify(published)); }catch(e){} }
 function showToast(t){ var el=document.getElementById('toast'); el.textContent=t||'已复制 ✅'; el.classList.add('show'); setTimeout(function(){el.classList.remove('show');},1400); }
@@ -214,5 +214,7 @@ function exportPub(){
   a.download='published.json'; a.click(); showToast('已导出已发布清单');
 }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+// 兜底：无论通过密码还是 session 恢复，进入即渲染（防止刷新后空白）
+if(document.readyState!=='loading'){ render(); } else { document.addEventListener('DOMContentLoaded', render); }
 </script>
 </body></html>
