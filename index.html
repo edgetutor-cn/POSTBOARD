@@ -111,11 +111,11 @@ function isPub(id){ return !!published[id]; }
 
 function gate(){
   var v = document.getElementById('pw').value;
-  if(v === PWD){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='';
+  if(v === PWD){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block';
     if(sessionStorage.getItem('pb_ok')!=='1') sessionStorage.setItem('pb_ok','1'); render(); }
   else { document.getElementById('pwerr').textContent='密码错误'; }
 }
-if(sessionStorage.getItem('pb_ok')==='1'){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display=''; render(); }
+if(sessionStorage.getItem('pb_ok')==='1'){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; render(); }
 
 function saveLocal(){ try{ localStorage.setItem('postboard_pub', JSON.stringify(published)); }catch(e){} }
 function showToast(t){ var el=document.getElementById('toast'); el.textContent=t||'已复制 ✅'; el.classList.add('show'); setTimeout(function(){el.classList.remove('show');},1400); }
@@ -134,7 +134,7 @@ function renderSidebar(){
   html += '<div class="acc-item '+(state.acc===null?'active':'')+'" onclick="pickAcc(null)">全部账号 <span class="cnt">'+DATA.posts.length+'</span></div>';
   accs.forEach(function(a){
     var tot=g[a].length, pub=g[a].filter(function(p){return isPub(p.id);}).length;
-    html += '<div class="acc-item '+(state.acc===a?'active':'')+'" onclick="pickAcc('+JSON.stringify(a)+')">'+esc(a)+' <span class="cnt">'+pub+'/'+tot+'</span></div>';
+    html += '<div class="acc-item '+(state.acc===a?'active':'')+'" onclick="pickAcc('+arg(a)+')">'+esc(a)+' <span class="cnt">'+pub+'/'+tot+'</span></div>';
   });
   document.getElementById('sidebar').innerHTML = html;
 }
@@ -160,7 +160,7 @@ function renderList(){
     html += '<div class="sec-h">'+esc(a)+' <span class="cnt">'+shown.length+' 篇</span></div>';
     shown.forEach(function(p){
       var b = isPub(p.id) ? '<span class="badge pub">已发布</span>' : '<span class="badge unpub">未发布</span>';
-      html += '<div class="row" onclick="openDetail('+JSON.stringify(p.id)+')">'
+      html += '<div class="row" onclick="openDetail('+arg(p.id)+')">'
             + '<span class="date">'+esc(p.date||'')+'</span>'
             + '<span class="ttl">'+esc(p.title)+'</span>'+ b +'</div>';
     });
@@ -178,16 +178,16 @@ function openDetail(id){
   var imgBlock = imgs ? ('<div class="blk"><div class="lab">本篇图片（'+p.imgs.length+' 张）</div><div class="gal">'+imgs+'</div>'
          + '<button class="btn" onclick="dlAll()">⬇ 下载本篇全部图片</button></div>') : '';
   var tagsBlock = p.tags ? '<div class="blk"><div class="lab">话题标签</div><div class="tags">'+esc(p.tags)+'</div>'
-         + '<button class="btn" onclick="copyText('+JSON.stringify(p.tags)+')">📋 复制标签</button></div>' : '';
+         + '<button class="btn" onclick="copyText('+arg(p.tags)+')">📋 复制标签</button></div>' : '';
   var pubBtn = isPub(p.id)
-    ? '<button class="btn pub-on" id="pubBtn" onclick="togglePub('+JSON.stringify(p.id)+')">✓ 已发布（点此取消）</button>'
-    : '<button class="btn" id="pubBtn" onclick="togglePub('+JSON.stringify(p.id)+')">标记已发布</button>';
+    ? '<button class="btn pub-on" id="pubBtn" onclick="togglePub('+arg(p.id)+')">✓ 已发布（点此取消）</button>'
+    : '<button class="btn" id="pubBtn" onclick="togglePub('+arg(p.id)+')">标记已发布</button>';
   var panel = '<div class="top"><div><h3>'+esc(p.title)+'</h3><div class="folder">'+esc(p.folder)+' · '+esc(p.date||'')+'</div></div>'
     + '<button class="x" onclick="closeModal()">×</button></div>'
     + '<div class="blk"><div class="lab">标题：</div><div class="pre">'+esc(p.title)+'</div>'
-    + '<button class="btn" onclick="copyText('+JSON.stringify(p.title)+')">📋 复制标题</button></div>'
+    + '<button class="btn" onclick="copyText('+arg(p.title)+')">📋 复制标题</button></div>'
     + '<div class="blk"><div class="lab">正文：</div><pre class="pre">'+esc(p.body)+'</pre>'
-    + '<button class="btn" onclick="copyText('+JSON.stringify(p.body)+')">📋 复制正文</button></div>'
+    + '<button class="btn" onclick="copyText('+arg(p.body)+')">📋 复制正文</button></div>'
     + tagsBlock + imgBlock
     + '<div class="blk">'+pubBtn+'</div>';
   document.getElementById('panel').innerHTML = panel;
@@ -214,6 +214,7 @@ function exportPub(){
   a.download='published.json'; a.click(); showToast('已导出已发布清单');
 }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function arg(v){ return JSON.stringify(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 // 兜底：无论通过密码还是 session 恢复，进入即渲染（防止刷新后空白）
 if(document.readyState!=='loading'){ render(); } else { document.addEventListener('DOMContentLoaded', render); }
 </script>
